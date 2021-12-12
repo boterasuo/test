@@ -1,8 +1,18 @@
 <?php
 require_once("pdo-connect.php"); //連線到遠端資料庫
+session_start();
 
 $id=$_POST["id"];
-$password=$_POST["password"];
+
+//判斷password是否有更新, 有的話才加密
+if($_POST["password"]===$_SESSION["user-original-psw"]){
+    $crPassword=$_SESSION["user-original-psw"];
+    echo $crPassword;
+}else{
+    $crPassword=md5($_POST["password"]);
+    echo $crPassword;
+}
+
 $name=$_POST["name"];
 $mobile=$_POST["mobile"];
 $valid=$_POST["valid"];
@@ -56,7 +66,7 @@ $sqlUser="UPDATE users SET password=?, name=?, gender=?, birthday=?, mobile=?, z
 WHERE id=?";
 $stmtUser=$db_host->prepare($sqlUser);
 try{
-    $stmtUser->execute([$password, $name, $gender, $birthday, $mobile, $zip, $county, $address, $valid, $id]);
+    $stmtUser->execute([$crPassword, $name, $gender, $birthday, $mobile, $zip, $county, $address, $valid, $id]);
 //    echo "修改資料完成<br>";
 //    header("location: user.php?id=$id");
 }catch(PDOException $e){
